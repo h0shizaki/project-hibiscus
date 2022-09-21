@@ -1,17 +1,10 @@
 package se233.hibiscus.controller;
 
-import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
-import javafx.stage.Popup;
-import javafx.stage.Stage;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
-import se233.hibiscus.Launcher;
-import se233.hibiscus.model.Zipper;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class ZipperController  {

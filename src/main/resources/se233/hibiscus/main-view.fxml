@@ -46,7 +46,6 @@
                         <TextField fx:id="nameInput"  layoutX="93.0" layoutY="92.0" />
                         <TextField fx:id="passwordInput" layoutX="93.0" layoutY="131.0" />
                         <ToggleButton fx:id="isRar" layoutX="266.0" layoutY="41.0" minWidth="100.0" mnemonicParsing="false" text="RAR" />
-                        <ToggleButton fx:id="is7Zip" layoutX="382.0" layoutY="42.0" minWidth="100.0" mnemonicParsing="false" text="7ZIP" />
                         <Button layoutX="266.0" layoutY="93.0" mnemonicParsing="false" text="Clear" />
                         <ToggleButton layoutX="266.0" layoutY="132.0" mnemonicParsing="false" text="Show" />
                         <Label layoutX="93.0" layoutY="165.0" text="Note: Do not need to fill password; No password" textFill="#727272" />

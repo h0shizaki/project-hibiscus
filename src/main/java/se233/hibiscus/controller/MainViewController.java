@@ -130,7 +130,7 @@ public class MainViewController {
 
                 String password ;
                 Optional<String> pwd = dialog.showAndWait();
-                password = pwd.get().toString();
+                password = pwd.get();
 
 
                 File destPath = dc.showDialog(new Stage());
@@ -141,8 +141,8 @@ public class MainViewController {
                     fileList.add(fileMap.get(inputListView.getItems().get(i)));
                 }
 
-                Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),"part1");
-                Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),"part1");
+                Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileName+"-part1."+fileExt);
+                Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileName+"-part2."+fileExt);
 
                 zipperController.createZipFile(fileList,password,output);
 
