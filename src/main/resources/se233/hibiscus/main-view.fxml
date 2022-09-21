@@ -56,7 +56,7 @@
           </Tab>
           <Tab text="Extract">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" fx:id="anchorPane">
                      <children>
                         <Button layoutX="486.0" layoutY="158.0" mnemonicParsing="false" text="Continue" />
                         <Label layoutX="14.0" layoutY="14.0" text="Preview">
@@ -71,12 +71,12 @@
           </Tab>
         </tabs>
       </TabPane>
-      <Button layoutX="526.0" layoutY="9.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" style="-fx-background-color: black;" text="+" textFill="WHITE">
+      <Button layoutX="526.0" layoutY="9.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" style="-fx-background-color: black;" text="+" textFill="WHITE" fx:id="importBtn">
          <font>
             <Font name="SF Pro Display Black" size="14.0" />
          </font>
       </Button>
-      <Button layoutX="552.0" layoutY="9.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="42.0" style="-fx-background-color: black;" text="-" textFill="WHITE">
+      <Button layoutX="552.0" layoutY="9.0" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="40.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="42.0" style="-fx-background-color: black;" text="-" textFill="WHITE" fx:id="removeBtn">
          <font>
             <Font name="SF Pro Display Black" size="17.0" />
          </font>
