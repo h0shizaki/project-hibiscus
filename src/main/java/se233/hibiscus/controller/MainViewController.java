@@ -43,15 +43,14 @@ public class MainViewController {
     private ToggleButton isTar;
     @FXML
     private ToggleButton is7Zip ;
-
     @FXML
     private TextField nameInput ;
     @FXML
     private TextField passwordInput ;
     @FXML
     private Button continueBtn ;
-
     ZipperController zipperController = new ZipperController() ;
+
 
     public void initialize() {
 
@@ -129,6 +128,7 @@ public class MainViewController {
                     DirectoryChooser dc = new DirectoryChooser();
 
                     String fileExt = getOutputFileExtension();
+
                     String fileName = nameInput.getText();
                     File destPath = dc.showDialog(new Stage());
                     String output = String.format("%s/%s.%s", destPath, fileName, fileExt);
@@ -177,10 +177,17 @@ public class MainViewController {
     }
 
     private String getOutputFileExtension() {
-        if(isRar.isSelected()) return  "rar" ;
-        if(isTar.isSelected()) return  "tar" ;
-        if(isZip.isSelected()) return  "zip" ;
-        return  "zip" ;
+        if(isRar.isSelected()){
+            return  "rar" ;
+        }
+        if(isTar.isSelected()){
+            return  "tar" ;
+        }
+        if(isZip.isSelected()){
+            return  "zip" ;
+        }
+        return "zip";
+
     }
 
     private Pane CreateDisplay(File file, String filePath) {
@@ -212,6 +219,8 @@ public class MainViewController {
             img =  new Image(Launcher.class.getResource("numbersIcon.png").toString());
         }else if (ext.toLowerCase().equals("xls")||ext.toLowerCase().equals("xltm")||ext.toLowerCase().equals("xlsm")||ext.toLowerCase().equals("xlsx")||ext.toLowerCase().equals("xltx")||ext.toLowerCase().equals("xlsb")){
             img =  new Image(Launcher.class.getResource("xlsIcon.png").toString());
+        }else if (ext.toLowerCase()== ""){
+            img =  new Image(Launcher.class.getResource("folderIcon.png").toString());
         }else {
             img =  new Image(Launcher.class.getResource("fileIcon.png").toString());
         }
@@ -221,6 +230,10 @@ public class MainViewController {
         iv.setFitWidth(128);
         Label label = new Label(file.getName());
 
+        if(ext.toLowerCase() == ""){
+            iv.setFitHeight(148);
+            iv.setFitWidth(158);
+        }
         VBox vBox = new VBox();
         vBox.setSpacing(5);
         vBox.setPadding(new Insets(0,5,0,5));
