@@ -184,14 +184,34 @@ public class MainViewController {
     }
 
     private Pane CreateDisplay(File file, String filePath) {
-        String ext =  Files.getFileExtension(filePath);
-        Image img ;
-        if (ext.toLowerCase().equals("png") || ext.equals("jpg")|| ext.equals("jpeg") || ext.equals("GIF")) {
-            img =  new Image(Launcher.class.getResource("imgIcon.png").toString());
-        }else if(ext.toLowerCase().equals("rar") || ext.equals("zip") || ext.equals("tar") || ext.equals("7zip")){
-            img =  new Image(Launcher.class.getResource("zipIcon.png").toString());
-        } else if (ext.toLowerCase().equals("pdf") || ext.equals("docx")) {
+        String ext = Files.getFileExtension(filePath);
+        Image img;
+        if (ext.toLowerCase().equals("png")) {
+            img = new Image(Launcher.class.getResource("pngIcon.png").toString());
+        } else if (ext.toLowerCase().equals("rar")) {
+            img = new Image(Launcher.class.getResource("rarIcon.png").toString());
+        }else if(ext.toLowerCase().equals("zip") || ext.toLowerCase().equals("7zip")){
+            img = new Image(Launcher.class.getResource("zipIcon.png").toString());
+        }else if(ext.toLowerCase().equals("tar")){
+            img = new Image(Launcher.class.getResource("tarIcon.png").toString());
+        }else if (ext.toLowerCase().equals("jpg") || ext.toLowerCase().equals("jpeg")) {
+            img = new Image(Launcher.class.getResource("jpgIcon.png").toString());
+        }else if (ext.toLowerCase().equals("gif")){
+            img = new Image(Launcher.class.getResource("gifIcon.png").toString());
+        }else if (ext.toLowerCase().equals("pdf")){
+            img = new Image(Launcher.class.getResource("pdfIcon.png").toString());
+        }else if (ext.toLowerCase().equals("docx") || ext.toLowerCase().equals("doc")) {
             img =  new Image(Launcher.class.getResource("docIcon.png").toString());
+        }else if (ext.toLowerCase().equals("mp4")) {
+            img =  new Image(Launcher.class.getResource("mp4Icon.png").toString());
+        }else if (ext.toLowerCase().equals("java")) {
+            img =  new Image(Launcher.class.getResource("javaIcon.png").toString());
+        }else if (ext.toLowerCase().equals("pages")||ext.toLowerCase().equals("page")) {
+            img =  new Image(Launcher.class.getResource("pagesIcon.png").toString());
+        }else if (ext.toLowerCase().equals("numbers")||ext.toLowerCase().equals("number")) {
+            img =  new Image(Launcher.class.getResource("numbersIcon.png").toString());
+        }else if (ext.toLowerCase().equals("xls")||ext.toLowerCase().equals("xltm")||ext.toLowerCase().equals("xlsm")||ext.toLowerCase().equals("xlsx")||ext.toLowerCase().equals("xltx")||ext.toLowerCase().equals("xlsb")){
+            img =  new Image(Launcher.class.getResource("xlsIcon.png").toString());
         }else {
             img =  new Image(Launcher.class.getResource("fileIcon.png").toString());
         }
