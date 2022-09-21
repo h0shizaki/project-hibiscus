@@ -20,7 +20,7 @@
             <Font name="SF Pro Display Bold" size="17.0" />
          </font>
       </Label>
-      <ListView layoutX="14.0" layoutY="41.0" orientation="HORIZONTAL" prefHeight="97.0" prefWidth="572.0" style="-fx-background-radius: 7;" />
+      <ListView fx:id="inputListView" layoutX="14.0" layoutY="41.0" orientation="HORIZONTAL" prefHeight="97.0" prefWidth="572.0" style="-fx-background-radius: 7;" />
       <TabPane layoutX="14.0" layoutY="155.0" prefHeight="231.0" prefWidth="572.0" style="-fx-background-color: white; -fx-background-radius: 7;" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab text="Compost">
