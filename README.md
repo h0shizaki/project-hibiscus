@@ -4,16 +4,19 @@
 Just a file archive project that is named for cool.  
 
 ### Goal
-* Import files and zip them up.
-* Enable to select archive file type.
+* ~~Import files and zip them up.~~
+* ~~Enable to select archive file type.~~
 * Extract file which has password.
-* Select the output path. 
+* ~~Select the output path.~~
 
 ### Note
-* Archive file with zip4j.
-* Make the password input dialog.
-* Make file type dialog
-* Make path select popup
+* Make Input validation
+* Extract features
+
+### Done
+* Compose encrypted archive
+* Multi-thread archive composing
 
 ## Cookbook and Document  
-**Very Soon ....**
+**Zip4J library is used to work with archive file.**
+

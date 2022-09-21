@@ -5,6 +5,7 @@ import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.EncryptionMethod;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,13 +13,15 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 public class Merger extends Task<Void> {
+    private  String password;
     private String fileName;
     private ArrayList<File> splitZipFileList;
 
 
-    public Merger(String fileName, ArrayList<String> splitFileName){
+    public Merger(String fileName, ArrayList<String> splitFileName, String password){
         this.fileName = fileName;
         this.splitZipFileList = new ArrayList<>();
+        this.password = password ;
 
         for (String filename : splitFileName ){
             splitZipFileList.add(new File(filename));
@@ -27,21 +30,36 @@ public class Merger extends Task<Void> {
     }
 
     @Override
-    public Void call() throws  ZipException, IOException{
-        ZipFile mergedZipFile = new ZipFile(this.fileName);
+    public Void call() throws IOException{
+        if(password.length() > 0){
+            ZipFile mergedZipFile = new ZipFile(this.fileName,password.toCharArray());
 
-        for(File fileToMerge : splitZipFileList) {
-            ZipFile zipFileToMerge = new ZipFile(fileToMerge);
+            for(File fileToMerge : splitZipFileList) {
+                ZipFile zipFileToMerge = new ZipFile(fileToMerge);
 
-            for(FileHeader fileHeader : zipFileToMerge.getFileHeaders()){
-                try (InputStream inputStream = zipFileToMerge.getInputStream(fileHeader)) {
-                    ZipParameters zipParameters = getZipParametersFromFileHeader(fileHeader) ;
-                    mergedZipFile.addStream(inputStream,zipParameters);
+                for(FileHeader fileHeader : zipFileToMerge.getFileHeaders()){
+                    try (InputStream inputStream = zipFileToMerge.getInputStream(fileHeader)) {
+                        ZipParameters zipParameters = getZipParametersFromFileHeaderWithPassword(fileHeader) ;
+                        mergedZipFile.addStream(inputStream,zipParameters);
 
+                    }
+                }
+            }
+        }else{
+            ZipFile mergedZipFile = new ZipFile(this.fileName);
+
+            for(File fileToMerge : splitZipFileList) {
+                ZipFile zipFileToMerge = new ZipFile(fileToMerge);
+
+                for(FileHeader fileHeader : zipFileToMerge.getFileHeaders()){
+                    try (InputStream inputStream = zipFileToMerge.getInputStream(fileHeader)) {
+                        ZipParameters zipParameters = getZipParametersFromFileHeader(fileHeader) ;
+                        mergedZipFile.addStream(inputStream,zipParameters);
+
+                    }
                 }
             }
         }
-        System.out.println("Merged!");
 
         splitZipFileList.forEach( tempFile -> {
             tempFile.delete() ;
@@ -60,14 +78,13 @@ public class Merger extends Task<Void> {
         return zipParameters;
     }
 
-//    @Override
-//    public Void call() throws ZipException {
-//        ZipFile mergedZipFile = new ZipFile(this.fileName);
-//
-//        for(File splitFile : splitZipFileList){
-//            mergedZipFile.mergeSplitFiles(splitFile);
-//        }
-//        System.out.println("Merged");
-//        return null;
-//    }
+    private ZipParameters getZipParametersFromFileHeaderWithPassword(FileHeader fileHeader) {
+        ZipParameters zipParameters = new ZipParameters();
+        zipParameters.setEncryptFiles(true);
+        zipParameters.setEncryptionMethod(EncryptionMethod.AES);
+        zipParameters.setCompressionMethod(fileHeader.getCompressionMethod());
+        zipParameters.setFileNameInZip(fileHeader.getFileName());
+        return zipParameters;
+    }
+
 }

@@ -5,29 +5,31 @@ import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Zipper extends Task<Void> {
 
     List<File> fileList ;
-    String fileName ;
-    public Zipper(List<File> fileList , String fileName){
+    String filename;
+
+    public Zipper(List<File> fileList , String filename){
         this.fileList = fileList ;
-        this.fileName = fileName ;
+        this.filename = filename;
+
     }
     @Override
     public Void call()  {
-        ZipFile zipFile = new ZipFile(this.fileName);
+        ZipFile zipFile = new ZipFile(this.filename);
 
-        fileList.forEach( file -> {
+        fileList.forEach(file -> {
             try {
                 zipFile.addFile(file);
             } catch (ZipException e) {
                 throw new RuntimeException(e);
             }
-        } );
-        System.out.println("Working!!");
+        });
+        System.out.println("Working!");
+
         return null;
     }
 }

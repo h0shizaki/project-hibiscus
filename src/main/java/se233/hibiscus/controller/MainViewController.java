@@ -125,14 +125,19 @@ public class MainViewController {
 
             if(inputListView.getItems().size() <= 0) return;
             if(nameInput.getText().isEmpty()) return;
-            String passwordCheck = passwordInput.getText();
 
-//            if(passwordCheck.isEmpty()) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Add Password");
+            dialog.setContentText("Password:");
+            dialog.setHeaderText(null);
+            dialog.setGraphic(null);
+
+            String password ;
+            Optional<String> pwd = dialog.showAndWait();
+            password = pwd.get();
+
                 try {
-                    String password = passwordInput.getText();
-
                     DirectoryChooser dc = new DirectoryChooser();
-
                     String fileExt = getOutputFileExtension();
 
                     String fileName = nameInput.getText();
@@ -144,10 +149,6 @@ public class MainViewController {
                         fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
                     }
 
-
-//                    zipperController.createZipFile(fileList, password, output);
-
-
                     String fileP1 = String.format("%s/%s-part1.%s", destPath, fileName, fileExt) ;
                     String fileP2 = String.format("%s/%s-part2.%s", destPath, fileName, fileExt) ;
                     ArrayList<String> partList = new ArrayList<>() ;
@@ -155,47 +156,19 @@ public class MainViewController {
                     partList.add(fileP2);
 
 
-                    Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1);
+                    Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1 );
                     Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2);
-                    Merger merger = new Merger(output,partList);
+
+                    Merger merger = new Merger(output,partList , password);
 
                     ex.submit(part1);
                     ex.submit(part2);
                     ex.submit(merger);
 
-
+                    System.out.println(password);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
-//            }else {
-//                DirectoryChooser dc = new DirectoryChooser();
-//
-//                String fileExt = getOutputFileExtension();
-//                String fileName = nameInput.getText();
-//
-//                TextInputDialog dialog = new TextInputDialog();
-//                dialog.setTitle("Confirm Password");
-//                dialog.setContentText("Password:");
-//                dialog.setHeaderText(null);
-//                dialog.setGraphic(null);
-//
-//                String password ;
-//                Optional<String> pwd = dialog.showAndWait();
-//                password = pwd.get();
-//
-//                File destPath = dc.showDialog(new Stage());
-//                String output = String.format("%s/%s.%s", destPath, fileName, fileExt);
-//
-//                ArrayList<File> fileList = new ArrayList<>();
-//                for (int i = 0; i < inputListView.getItems().size(); i++) {
-//                    fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
-//                }
-//
-//                zipperController.createZipFile(fileList, password, output);
-//
-//            }
         });
 
     }
