@@ -14,18 +14,18 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import se233.hibiscus.Launcher;
 import se233.hibiscus.model.Zipper;
 
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 public class MainViewController {
 
-    private ArrayList<String> fileList ;
     private HashMap<Pane , String> fileMap = new HashMap<>() ;
     @FXML
     private ListView<Pane> inputListView ;
@@ -40,13 +40,9 @@ public class MainViewController {
     private ToggleButton isRar ;
     @FXML
     private ToggleButton isTar;
-    @FXML
-    private ToggleButton is7Zip ;
 
     @FXML
     private TextField nameInput ;
-    @FXML
-    private TextField passwordInput ;
     @FXML
     private Button continueBtn ;
 
@@ -125,15 +121,28 @@ public class MainViewController {
 
                 String fileExt = getOutputFileExtension();
                 String fileName = nameInput.getText();
-                String password = passwordInput.getText();
+
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Add Password");
+                dialog.setContentText("Password:");
+                dialog.setHeaderText(null);
+                dialog.setGraphic(null);
+
+                String password ;
+                Optional<String> pwd = dialog.showAndWait();
+                password = pwd.get().toString();
+
 
                 File destPath = dc.showDialog(new Stage());
                 String output = String.format("%s/%s.%s", destPath,fileName,fileExt);
 
-                ArrayList<File> fileList = new ArrayList<>() ;
+                ArrayList<String> fileList = new ArrayList<>() ;
                 for(int i = 0 ; i < inputListView.getItems().size() ;i++){
-                    fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
+                    fileList.add(fileMap.get(inputListView.getItems().get(i)));
                 }
+
+                Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),"part1");
+                Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),"part1");
 
                 zipperController.createZipFile(fileList,password,output);
 
@@ -148,7 +157,6 @@ public class MainViewController {
         if(isRar.isSelected()) return  "rar" ;
         if(isTar.isSelected()) return  "tar" ;
         if(isZip.isSelected()) return  "zip" ;
-        if(is7Zip.isSelected()) return  "7zip" ;
         return  "zip" ;
     }
 

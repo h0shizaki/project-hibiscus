@@ -18,11 +18,7 @@ public class ZipperController  {
     public ZipperController() {
 
     }
-    public void createZipFile(ArrayList<File> fileList, String password , String destOutput) {
-        System.out.println(fileList);
-        System.out.println(password);
-        System.out.println(destOutput);
-
+    public void createZipFile(ArrayList<String> fileList, String password , String destOutput) {
         if(password.length() > 0){
             ZipParameters zipParameters = new ZipParameters();
             zipParameters.setEncryptFiles(true);
@@ -31,7 +27,7 @@ public class ZipperController  {
 
             fileList.forEach( file -> {
                 try {
-                    zipFile.addFile(file.getAbsolutePath(), zipParameters);
+                    zipFile.addFile(file, zipParameters);
                 } catch (ZipException e) {
                     throw new RuntimeException(e);
                 }
@@ -43,15 +39,13 @@ public class ZipperController  {
 
             fileList.forEach( file -> {
                 try {
-                    zipFile.addFile(file.getAbsolutePath());
+                    zipFile.addFile(file);
                 } catch (ZipException e) {
                     throw new RuntimeException(e);
                 }
 
             } );
         }
-
-
     }
 
 }
