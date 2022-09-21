@@ -14,18 +14,23 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import se233.hibiscus.Launcher;
+import se233.hibiscus.model.Merger;
 import se233.hibiscus.model.Zipper;
-
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainViewController {
 
+    private ArrayList<String> fileList ;
     private HashMap<Pane , String> fileMap = new HashMap<>() ;
     @FXML
     private ListView<Pane> inputListView ;
@@ -40,13 +45,16 @@ public class MainViewController {
     private ToggleButton isRar ;
     @FXML
     private ToggleButton isTar;
-
+    @FXML
+    private ToggleButton is7Zip ;
     @FXML
     private TextField nameInput ;
     @FXML
+    private TextField passwordInput ;
+    @FXML
     private Button continueBtn ;
-
     ZipperController zipperController = new ZipperController() ;
+
 
     public void initialize() {
 
@@ -112,76 +120,148 @@ public class MainViewController {
         });
 
         continueBtn.setOnAction( event -> {
+
+            ExecutorService ex = Executors.newFixedThreadPool(2) ;
+
             if(inputListView.getItems().size() <= 0) return;
             if(nameInput.getText().isEmpty()) return;
+            String passwordCheck = passwordInput.getText();
 
-            try {
+//            if(passwordCheck.isEmpty()) {
+                try {
+                    String password = passwordInput.getText();
 
-                DirectoryChooser dc = new DirectoryChooser();
+                    DirectoryChooser dc = new DirectoryChooser();
 
-                String fileExt = getOutputFileExtension();
-                String fileName = nameInput.getText();
+                    String fileExt = getOutputFileExtension();
 
-                TextInputDialog dialog = new TextInputDialog();
-                dialog.setTitle("Add Password");
-                dialog.setContentText("Password:");
-                dialog.setHeaderText(null);
-                dialog.setGraphic(null);
+                    String fileName = nameInput.getText();
+                    File destPath = dc.showDialog(new Stage());
+                    String output = String.format("%s/%s.%s", destPath, fileName, fileExt);
 
-                String password ;
-                Optional<String> pwd = dialog.showAndWait();
-                password = pwd.get();
+                    ArrayList<File> fileList = new ArrayList<>();
+                    for (int i = 0; i < inputListView.getItems().size(); i++) {
+                        fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
+                    }
 
 
-                File destPath = dc.showDialog(new Stage());
-                String output = String.format("%s/%s.%s", destPath,fileName,fileExt);
+//                    zipperController.createZipFile(fileList, password, output);
 
-                ArrayList<String> fileList = new ArrayList<>() ;
-                for(int i = 0 ; i < inputListView.getItems().size() ;i++){
-                    fileList.add(fileMap.get(inputListView.getItems().get(i)));
+
+                    String fileP1 = String.format("%s/%s-part1.%s", destPath, fileName, fileExt) ;
+                    String fileP2 = String.format("%s/%s-part2.%s", destPath, fileName, fileExt) ;
+                    ArrayList<String> partList = new ArrayList<>() ;
+                    partList.add(fileP1);
+                    partList.add(fileP2);
+
+
+                    Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1);
+                    Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2);
+                    Merger merger = new Merger(output,partList);
+
+                    ex.submit(part1);
+                    ex.submit(part2);
+                    ex.submit(merger);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
-                Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileName+"-part1."+fileExt);
-                Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileName+"-part2."+fileExt);
 
-                zipperController.createZipFile(fileList,password,output);
-
-            }catch (Exception e){
-                e.printStackTrace();
-            }
+//            }else {
+//                DirectoryChooser dc = new DirectoryChooser();
+//
+//                String fileExt = getOutputFileExtension();
+//                String fileName = nameInput.getText();
+//
+//                TextInputDialog dialog = new TextInputDialog();
+//                dialog.setTitle("Confirm Password");
+//                dialog.setContentText("Password:");
+//                dialog.setHeaderText(null);
+//                dialog.setGraphic(null);
+//
+//                String password ;
+//                Optional<String> pwd = dialog.showAndWait();
+//                password = pwd.get();
+//
+//                File destPath = dc.showDialog(new Stage());
+//                String output = String.format("%s/%s.%s", destPath, fileName, fileExt);
+//
+//                ArrayList<File> fileList = new ArrayList<>();
+//                for (int i = 0; i < inputListView.getItems().size(); i++) {
+//                    fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
+//                }
+//
+//                zipperController.createZipFile(fileList, password, output);
+//
+//            }
         });
 
     }
 
     private String getOutputFileExtension() {
-        if(isRar.isSelected()) return  "rar" ;
-        if(isTar.isSelected()) return  "tar" ;
-        if(isZip.isSelected()) return  "zip" ;
-        return  "zip" ;
+        if(isRar.isSelected()){
+            return  "rar" ;
+        }
+        if(isTar.isSelected()){
+            return  "tar" ;
+        }
+        if(isZip.isSelected()){
+            return  "zip" ;
+        }
+        return "zip";
+
     }
 
     private Pane CreateDisplay(File file, String filePath) {
-        String ext =  Files.getFileExtension(filePath);
-        Image img ;
-        if (ext.equals("png") || ext.equals("jpg")|| ext.equals("jpeg") || ext.equals("GIF")) {
-            img =  new Image(Launcher.class.getResource("imgIcon.png").toString());
-        }else if(ext.equals("rar") || ext.equals("zip") || ext.equals("tar") || ext.equals("7zip")){
-            img =  new Image(Launcher.class.getResource("zipIcon.png").toString());
-        } else if (ext.equals("pdf") || ext.equals("docx")) {
+        String ext = Files.getFileExtension(filePath);
+        Image img;
+        if (ext.toLowerCase().equals("png")) {
+            img = new Image(Launcher.class.getResource("pngIcon.png").toString());
+        } else if (ext.toLowerCase().equals("rar")) {
+            img = new Image(Launcher.class.getResource("rarIcon.png").toString());
+        }else if(ext.toLowerCase().equals("zip") || ext.toLowerCase().equals("7zip")){
+            img = new Image(Launcher.class.getResource("zipIcon.png").toString());
+        }else if(ext.toLowerCase().equals("tar")){
+            img = new Image(Launcher.class.getResource("tarIcon.png").toString());
+        }else if (ext.toLowerCase().equals("jpg") || ext.toLowerCase().equals("jpeg")) {
+            img = new Image(Launcher.class.getResource("jpgIcon.png").toString());
+        }else if (ext.toLowerCase().equals("gif")){
+            img = new Image(Launcher.class.getResource("gifIcon.png").toString());
+        }else if (ext.toLowerCase().equals("pdf")){
+            img = new Image(Launcher.class.getResource("pdfIcon.png").toString());
+        }else if (ext.toLowerCase().equals("docx") || ext.toLowerCase().equals("doc")) {
             img =  new Image(Launcher.class.getResource("docIcon.png").toString());
+        }else if (ext.toLowerCase().equals("mp4")) {
+            img =  new Image(Launcher.class.getResource("mp4Icon.png").toString());
+        }else if (ext.toLowerCase().equals("java")) {
+            img =  new Image(Launcher.class.getResource("javaIcon.png").toString());
+        }else if (ext.toLowerCase().equals("pages")||ext.toLowerCase().equals("page")) {
+            img =  new Image(Launcher.class.getResource("pagesIcon.png").toString());
+        }else if (ext.toLowerCase().equals("numbers")||ext.toLowerCase().equals("number")) {
+            img =  new Image(Launcher.class.getResource("numbersIcon.png").toString());
+        }else if (ext.toLowerCase().equals("xls")||ext.toLowerCase().equals("xltm")||ext.toLowerCase().equals("xlsm")||ext.toLowerCase().equals("xlsx")||ext.toLowerCase().equals("xltx")||ext.toLowerCase().equals("xlsb")){
+            img =  new Image(Launcher.class.getResource("xlsIcon.png").toString());
+        }else if (ext.toLowerCase()== ""){
+            img =  new Image(Launcher.class.getResource("folderIcon.png").toString());
         }else {
             img =  new Image(Launcher.class.getResource("fileIcon.png").toString());
         }
 
         ImageView iv = new ImageView(img) ;
-        iv.setFitHeight(64);
-        iv.setFitWidth(64);
+        iv.setFitHeight(148);
+        iv.setFitWidth(128);
         Label label = new Label(file.getName());
 
+        if(ext.toLowerCase() == ""){
+            iv.setFitHeight(148);
+            iv.setFitWidth(158);
+        }
         VBox vBox = new VBox();
         vBox.setSpacing(5);
         vBox.setPadding(new Insets(0,5,0,5));
-        vBox.getChildren().addAll(label,iv);
+        vBox.getChildren().addAll(iv,label);
         Pane myPane = new Pane() ;
         myPane.getChildren().addAll(vBox);
 

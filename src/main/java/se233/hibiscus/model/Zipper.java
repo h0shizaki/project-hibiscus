@@ -9,20 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Zipper extends Task<Void> {
-    List<String> paths ;
-    ArrayList<File> fileList = new ArrayList<>() ;
-    String fileName ;
-    public Zipper(List<String> paths , String fileName){
 
-        this.paths = paths ;
+    List<File> fileList ;
+    String fileName ;
+    public Zipper(List<File> fileList , String fileName){
+        this.fileList = fileList ;
         this.fileName = fileName ;
-        paths.forEach( path -> {
-            fileList.add(new File(path)) ;
-        });
     }
     @Override
     public Void call()  {
-        ZipFile zipFile = new ZipFile("/temp/"+ this.fileName);
+        ZipFile zipFile = new ZipFile(this.fileName);
 
         fileList.forEach( file -> {
             try {
@@ -31,7 +27,7 @@ public class Zipper extends Task<Void> {
                 throw new RuntimeException(e);
             }
         } );
-
+        System.out.println("Working!!");
         return null;
     }
 }
