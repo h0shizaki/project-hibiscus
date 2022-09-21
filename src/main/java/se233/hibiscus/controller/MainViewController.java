@@ -4,9 +4,7 @@ package se233.hibiscus.controller;
 import com.google.common.io.Files;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
@@ -14,9 +12,12 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import se233.hibiscus.Launcher;
+import se233.hibiscus.model.Zipper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,8 +35,22 @@ public class MainViewController {
     private Button removeBtn ;
 
     @FXML
-    private AnchorPane anchorPane ;
+    private ToggleButton isZip ;
+    @FXML
+    private ToggleButton isRar ;
+    @FXML
+    private ToggleButton isTar;
+    @FXML
+    private ToggleButton is7Zip ;
 
+    @FXML
+    private TextField nameInput ;
+    @FXML
+    private TextField passwordInput ;
+    @FXML
+    private Button continueBtn ;
+
+    ZipperController zipperController = new ZipperController() ;
 
     public void initialize() {
 
@@ -100,6 +115,41 @@ public class MainViewController {
             }
         });
 
+        continueBtn.setOnAction( event -> {
+            if(inputListView.getItems().size() <= 0) return;
+            if(nameInput.getText().isEmpty()) return;
+
+            try {
+
+                DirectoryChooser dc = new DirectoryChooser();
+
+                String fileExt = getOutputFileExtension();
+                String fileName = nameInput.getText();
+                String password = passwordInput.getText();
+
+                File destPath = dc.showDialog(new Stage());
+                String output = String.format("%s/%s.%s", destPath,fileName,fileExt);
+
+                ArrayList<File> fileList = new ArrayList<>() ;
+                for(int i = 0 ; i < inputListView.getItems().size() ;i++){
+                    fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
+                }
+
+                zipperController.createZipFile(fileList,password,output);
+
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+    private String getOutputFileExtension() {
+        if(isRar.isSelected()) return  "rar" ;
+        if(isTar.isSelected()) return  "tar" ;
+        if(isZip.isSelected()) return  "zip" ;
+        if(is7Zip.isSelected()) return  "7zip" ;
+        return  "zip" ;
     }
 
     private Pane CreateDisplay(File file, String filePath) {

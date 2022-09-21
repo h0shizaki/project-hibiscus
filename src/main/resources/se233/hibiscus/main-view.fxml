@@ -25,28 +25,28 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button layoutX="491.0" layoutY="160.0" mnemonicParsing="false" text="Continue" />
+                        <Button layoutX="491.0" layoutY="160.0" mnemonicParsing="false" text="Continue" fx:id="continueBtn"/>
                         <Label layoutX="14.0" layoutY="14.0" text="Format">
                            <font>
                               <Font name="SF Pro Display Bold" size="14.0" />
                            </font>
                         </Label>
-                        <ToggleButton layoutX="28.0" layoutY="41.0" minWidth="100.0" mnemonicParsing="false" text="ZIP" />
-                        <ToggleButton layoutX="147.0" layoutY="42.0" minWidth="100.0" mnemonicParsing="false" text="TAR" />
+                        <ToggleButton fx:id="isZip" layoutX="28.0" layoutY="41.0" minWidth="100.0" mnemonicParsing="false" text="ZIP" />
+                        <ToggleButton fx:id="isTar" layoutX="147.0" layoutY="42.0" minWidth="100.0" mnemonicParsing="false" text="TAR" />
                         <Label layoutX="13.0" layoutY="96.0" text="File name">
                            <font>
                               <Font name="SF Pro Display Bold" size="14.0" />
                            </font>
                         </Label>
-                        <Label layoutX="12.0" layoutY="135.0" text="Password">
+                        <Label  layoutX="12.0" layoutY="135.0" text="Password">
                            <font>
                               <Font name="SF Pro Display Bold" size="14.0" />
                            </font>
                         </Label>
-                        <TextField layoutX="93.0" layoutY="92.0" />
-                        <TextField layoutX="93.0" layoutY="131.0" />
-                        <ToggleButton layoutX="266.0" layoutY="41.0" minWidth="100.0" mnemonicParsing="false" text="RAR" />
-                        <ToggleButton layoutX="382.0" layoutY="42.0" minWidth="100.0" mnemonicParsing="false" text="RAR" />
+                        <TextField fx:id="nameInput"  layoutX="93.0" layoutY="92.0" />
+                        <TextField fx:id="passwordInput" layoutX="93.0" layoutY="131.0" />
+                        <ToggleButton fx:id="isRar" layoutX="266.0" layoutY="41.0" minWidth="100.0" mnemonicParsing="false" text="RAR" />
+                        <ToggleButton fx:id="is7Zip" layoutX="382.0" layoutY="42.0" minWidth="100.0" mnemonicParsing="false" text="7ZIP" />
                         <Button layoutX="266.0" layoutY="93.0" mnemonicParsing="false" text="Clear" />
                         <ToggleButton layoutX="266.0" layoutY="132.0" mnemonicParsing="false" text="Show" />
                         <Label layoutX="93.0" layoutY="165.0" text="Note: Do not need to fill password; No password" textFill="#727272" />
@@ -58,7 +58,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" fx:id="anchorPane">
                      <children>
-                        <Button layoutX="486.0" layoutY="158.0" mnemonicParsing="false" text="Continue" />
+                        <Button layoutX="486.0" layoutY="158.0" mnemonicParsing="false" text="Extract" />
                         <Label layoutX="14.0" layoutY="14.0" text="Preview">
                            <font>
                               <Font name="SF Pro Display Bold" size="14.0" />
