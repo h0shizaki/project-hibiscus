@@ -77,8 +77,8 @@
                               <Font name="SF Pro Display Bold" size="20.0" />
                            </font>
                         </Label>
-                        <ListView layoutX="21.0" layoutY="44.0" prefHeight="135.0" prefWidth="926.0" />
-                        <Button layoutX="852.0" layoutY="204.0" minWidth="100.0" mnemonicParsing="false" style="-fx-background-color: green; -fx-background-radius: 17; -fx-border-radius: 17;" text="Extract" textFill="WHITE">
+                        <ListView fx:id="previewListView" layoutX="21.0" layoutY="44.0" prefHeight="135.0" prefWidth="926.0" />
+                        <Button layoutX="852.0" layoutY="204.0" minWidth="100.0" mnemonicParsing="false" style="-fx-background-color: green; -fx-background-radius: 17; -fx-border-radius: 17;" fx:id="extractBtn" text="Extract" textFill="WHITE">
                            <font>
                               <Font name="SF Pro Display Regular" size="17.0" />
                            </font>

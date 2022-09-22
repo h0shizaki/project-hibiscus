@@ -2,32 +2,32 @@ package se233.hibiscus.controller;
 
 
 import com.google.common.io.Files;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import se233.hibiscus.Launcher;
+import se233.hibiscus.model.Extracter;
 import se233.hibiscus.model.Merger;
 import se233.hibiscus.model.Zipper;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class MainViewController {
 
@@ -54,8 +54,11 @@ public class MainViewController {
     private TextField passwordInput ;
     @FXML
     private Button continueBtn ;
+    @FXML
+    private Button extractBtn ;
 
-
+    @FXML
+    private ListView<HBox> previewListView ;
 
     public void initialize() {
 
@@ -180,6 +183,80 @@ public class MainViewController {
                 alert.showAndWait();
             }
         });
+
+        extractBtn.setOnAction( event -> {
+            try {
+                ExecutorService es = Executors.newFixedThreadPool(2);
+                CountDownLatch countDownLatch = new CountDownLatch(2) ;
+
+                ArrayList<File> fileList = new ArrayList<>();
+                for (int i = 0; i < inputListView.getItems().size(); i++) {
+                    fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
+                }
+
+                List<File> onlyArchiveList = fileList.stream()
+                        .filter(file -> {
+                            String ext = Files.getFileExtension(file.getAbsolutePath());
+                            return ext.equals("zip") ||
+                                    ext.equals("rar") ||
+                                    ext.equals("tar");
+                        })
+                        .collect(Collectors.toList());
+
+                DirectoryChooser dc = new DirectoryChooser();
+                String destPath = dc.showDialog(new Stage()).getAbsolutePath();
+
+                List<File> archiveListPart1 = onlyArchiveList.subList(0, (int) (onlyArchiveList.size() / 2));
+                List<File> archiveListPart2 = onlyArchiveList.subList((int) (onlyArchiveList.size() / 2), onlyArchiveList.size());
+                previewListView.getItems().clear();
+
+                Extracter extracterPart1 = new Extracter(archiveListPart1, destPath,countDownLatch);
+                Extracter extracterPart2 = new Extracter(archiveListPart2, destPath,countDownLatch);
+
+                previewListView.getItems().add(drawIndicatorOfFile(extracterPart2));
+                previewListView.getItems().add(drawIndicatorOfFile(extracterPart1));
+//            System.out.println(extracterPart2.getFiles());
+
+            es.submit(extracterPart2);
+            es.submit(extracterPart1);
+            es.shutdown();
+            }catch (IndexOutOfBoundsException ex){
+                System.out.println("Err" + ex.getMessage());
+            }
+        });
+    }
+
+    private HBox drawIndicatorOfFile(Extracter extracter){
+        HBox myBox = new HBox();
+        myBox.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(7), BorderWidths.DEFAULT)));
+
+        try {
+            VBox progressLabelVBox = new VBox();
+            VBox progressBarVbox = new VBox();
+
+            String progressName = "";
+            for (File file : extracter.getFiles()) {
+                progressName += String.format("%s\t\n", file.getName());
+            }
+
+            Label label = new Label(progressName);
+            progressLabelVBox.getChildren().add(label);
+
+            ProgressBar pb = new ProgressBar();
+            pb.setProgress(0.0);
+            pb.progressProperty().bind(extracter.progressProperty());
+            progressBarVbox.getChildren().add(pb);
+            progressBarVbox.setAlignment(Pos.CENTER_LEFT);
+
+            label.setAlignment(Pos.CENTER_LEFT);
+            progressLabelVBox.setPadding(new Insets(0, 5, 0, 5));
+            myBox.getChildren().addAll(progressLabelVBox);
+
+        }catch (Exception e){
+//            e.printStackTrace();
+            System.out.println("Err"+ e.getMessage());
+        }
+        return myBox;
 
     }
 
