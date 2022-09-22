@@ -126,8 +126,9 @@ public class MainViewController {
             if(inputListView.getItems().size() <= 0) return;
             if(nameInput.getText().isEmpty()) return;
 
+//            String password_org = passwordInput;
             TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Add Password");
+            dialog.setTitle("Confirm Password");
             dialog.setContentText("Password:");
             dialog.setHeaderText(null);
             dialog.setGraphic(null);
@@ -135,6 +136,7 @@ public class MainViewController {
             String password ;
             Optional<String> pwd = dialog.showAndWait();
             password = pwd.get();
+            if(passwordInput.getText().equals(password)) {
 
                 try {
                     DirectoryChooser dc = new DirectoryChooser();
@@ -149,17 +151,17 @@ public class MainViewController {
                         fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
                     }
 
-                    String fileP1 = String.format("%s/%s-part1.%s", destPath, fileName, fileExt) ;
-                    String fileP2 = String.format("%s/%s-part2.%s", destPath, fileName, fileExt) ;
-                    ArrayList<String> partList = new ArrayList<>() ;
+                    String fileP1 = String.format("%s/%s-part1.%s", destPath, fileName, fileExt);
+                    String fileP2 = String.format("%s/%s-part2.%s", destPath, fileName, fileExt);
+                    ArrayList<String> partList = new ArrayList<>();
                     partList.add(fileP1);
                     partList.add(fileP2);
 
 
-                    Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1 );
-                    Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2);
+                    Zipper part1 = new Zipper(fileList.subList(0, (int) (fileList.size() / 2)), fileP1);
+                    Zipper part2 = new Zipper(fileList.subList((int) (fileList.size() / 2), fileList.size()), fileP2);
 
-                    Merger merger = new Merger(output,partList , password);
+                    Merger merger = new Merger(output, partList, password);
 
                     ex.submit(part1);
                     ex.submit(part2);
@@ -169,6 +171,13 @@ public class MainViewController {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }else {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle(null);
+                alert.setHeaderText(null);
+                alert.setContentText("Seem your password is does not match.");
+                alert.showAndWait();
+            }
         });
 
     }
