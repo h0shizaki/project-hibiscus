@@ -6,16 +6,18 @@ import net.lingala.zip4j.exception.ZipException;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class Zipper extends Task<Void> {
 
     List<File> fileList ;
     String filename;
+    private CountDownLatch startSignal ;
 
-    public Zipper(List<File> fileList , String filename){
+    public Zipper(List<File> fileList , String filename, CountDownLatch countDownLatch){
         this.fileList = fileList ;
         this.filename = filename;
-
+        this.startSignal = countDownLatch ;
     }
     @Override
     public Void call()  {
@@ -29,6 +31,7 @@ public class Zipper extends Task<Void> {
             }
         });
         System.out.println("Working!");
+        this.startSignal.countDown();
 
         return null;
     }

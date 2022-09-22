@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -53,7 +54,7 @@ public class MainViewController {
     private TextField passwordInput ;
     @FXML
     private Button continueBtn ;
-    ZipperController zipperController = new ZipperController() ;
+
 
 
     public void initialize() {
@@ -122,6 +123,7 @@ public class MainViewController {
         continueBtn.setOnAction( event -> {
 
             ExecutorService ex = Executors.newFixedThreadPool(2) ;
+            CountDownLatch countDownLatch = new CountDownLatch(2);
 
             if(inputListView.getItems().size() <= 0) return;
             if(nameInput.getText().isEmpty()) return;
@@ -156,10 +158,11 @@ public class MainViewController {
                     partList.add(fileP2);
 
 
-                    Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1 );
-                    Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2);
 
-                    Merger merger = new Merger(output,partList , password);
+                    Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1 , countDownLatch);
+                    Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2 , countDownLatch);
+
+                    Merger merger = new Merger(output,partList , password , countDownLatch);
 
                     ex.submit(part1);
                     ex.submit(part2);

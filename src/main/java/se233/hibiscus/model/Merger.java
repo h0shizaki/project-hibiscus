@@ -2,7 +2,6 @@ package se233.hibiscus.model;
 
 import javafx.concurrent.Task;
 import net.lingala.zip4j.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
@@ -11,18 +10,20 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 public class Merger extends Task<Void> {
     private  String password;
     private String fileName;
     private ArrayList<File> splitZipFileList;
+    private CountDownLatch startSignal;
 
 
-    public Merger(String fileName, ArrayList<String> splitFileName, String password){
+    public Merger(String fileName, ArrayList<String> splitFileName, String password , CountDownLatch countDownLatch){
         this.fileName = fileName;
         this.splitZipFileList = new ArrayList<>();
         this.password = password ;
-
+        this.startSignal = countDownLatch ;
         for (String filename : splitFileName ){
             splitZipFileList.add(new File(filename));
         }
@@ -30,7 +31,9 @@ public class Merger extends Task<Void> {
     }
 
     @Override
-    public Void call() throws IOException{
+    public Void call() throws IOException, InterruptedException{
+
+        startSignal.await();
         if(password.length() > 0){
             ZipFile mergedZipFile = new ZipFile(this.fileName,password.toCharArray());
 
