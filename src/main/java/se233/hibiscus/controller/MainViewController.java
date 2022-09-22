@@ -84,7 +84,13 @@ public class MainViewController {
                     Pane myPane = CreateDisplay(file, filePath);
 
                     fileMap.put(myPane , filePath) ;
-                    inputListView.getItems().add(myPane);
+                    String ext = Files.getFileExtension(filePath);
+
+                    if(ext.toLowerCase().equals("")){
+
+                    }else {
+                        inputListView.getItems().add(myPane);
+                    }
                 }
 
             }
@@ -128,7 +134,6 @@ public class MainViewController {
             if(inputListView.getItems().size() <= 0) return;
             if(nameInput.getText().isEmpty()) return;
 
-//            String password_org = passwordInput;
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Confirm Password");
             dialog.setContentText("Password:");
@@ -228,6 +233,11 @@ public class MainViewController {
             img =  new Image(Launcher.class.getResource("xlsIcon.png").toString());
         }else if (ext.toLowerCase()== ""){
             img =  new Image(Launcher.class.getResource("folderIcon.png").toString());
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle(null);
+            alert.setHeaderText(null);
+            alert.setContentText("We are not support this folder.");
+            alert.showAndWait();
         }else {
             img =  new Image(Launcher.class.getResource("fileIcon.png").toString());
         }
