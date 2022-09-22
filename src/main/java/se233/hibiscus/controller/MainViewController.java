@@ -2,7 +2,7 @@ package se233.hibiscus.controller;
 
 
 import com.google.common.io.Files;
-import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -87,7 +87,13 @@ public class MainViewController {
                     Pane myPane = CreateDisplay(file, filePath);
 
                     fileMap.put(myPane , filePath) ;
-                    inputListView.getItems().add(myPane);
+                    String ext = Files.getFileExtension(filePath);
+
+                    if(ext.toLowerCase().equals("")){
+
+                    }else {
+                        inputListView.getItems().add(myPane);
+                    }
                 }
 
             }
@@ -125,13 +131,13 @@ public class MainViewController {
 
         continueBtn.setOnAction( event -> {
 
-            ExecutorService ex = Executors.newFixedThreadPool(2) ;
+
+            ExecutorService ex = Executors.newFixedThreadPool(3) ;
             CountDownLatch countDownLatch = new CountDownLatch(2);
 
             if(inputListView.getItems().size() <= 0) return;
             if(nameInput.getText().isEmpty()) return;
 
-//            String password_org = passwordInput;
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Confirm Password");
             dialog.setContentText("Password:");
@@ -156,22 +162,48 @@ public class MainViewController {
                         fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
                     }
 
+
                     String fileP1 = String.format("%s/%s-part1.%s", destPath, fileName, fileExt);
                     String fileP2 = String.format("%s/%s-part2.%s", destPath, fileName, fileExt);
                     ArrayList<String> partList = new ArrayList<>();
                     partList.add(fileP1);
                     partList.add(fileP2);
 
+
+
+                    ProgressIndicator PI=new ProgressIndicator();
+                    Alert alert = new Alert(Alert.AlertType.WARNING);
+                    Task<Void> indicatorTask = new Task<Void>() {
+                        @Override
+                        protected Void call() throws Exception {
+                            alert.setTitle(null);
+                            alert.setHeaderText(null);
+                            alert.setGraphic(PI);
+                            alert.setContentText("Processing...");
+                            alert.showAndWait();
+                            return null;
+                        }
+                    };
+
+                    ex.submit(indicatorTask);
+
                     Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1 , countDownLatch);
                     Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2 , countDownLatch);
-
                     Merger merger = new Merger(output,partList , password , countDownLatch);
+
 
                     ex.submit(part1);
                     ex.submit(part2);
                     ex.submit(merger);
 
+                    alert.setTitle(null);
+                    alert.setHeaderText(null);
+                    alert.setGraphic(null);
+                    alert.setContentText("Done");
+                    alert.showAndWait();
+
                     System.out.println(password);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -305,6 +337,11 @@ public class MainViewController {
             img =  new Image(Launcher.class.getResource("xlsIcon.png").toString());
         }else if (ext.toLowerCase()== ""){
             img =  new Image(Launcher.class.getResource("folderIcon.png").toString());
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle(null);
+            alert.setHeaderText(null);
+            alert.setContentText("We are not support this folder.");
+            alert.showAndWait();
         }else {
             img =  new Image(Launcher.class.getResource("fileIcon.png").toString());
         }
@@ -312,7 +349,9 @@ public class MainViewController {
         ImageView iv = new ImageView(img) ;
         iv.setFitHeight(148);
         iv.setFitWidth(128);
-        Label label = new Label(file.getName());
+        String fileName = file.getName();
+        Label label = new Label(fileName);
+
 
         if(ext.toLowerCase() == ""){
             iv.setFitHeight(148);

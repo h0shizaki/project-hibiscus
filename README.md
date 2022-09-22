@@ -9,9 +9,10 @@ Just a file archive project that is named for cool.
 * Extract file which has password.
 * ~~Select the output path.~~
 
-### Note
-* Make Input validation
-* Extract features
+### TODO
+* Make progress bar
+* Clear file list button
+* Extract features with password
 
 ### Done
 * Compose encrypted archive
