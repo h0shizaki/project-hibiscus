@@ -2,10 +2,14 @@ package se233.hibiscus.controller;
 
 
 import com.google.common.io.Files;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -27,6 +31,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class MainViewController {
@@ -59,6 +64,7 @@ public class MainViewController {
 
     @FXML
     private ListView<HBox> previewListView ;
+    private int status;
 
     public void initialize() {
 
@@ -137,16 +143,22 @@ public class MainViewController {
 
             if(inputListView.getItems().size() <= 0) return;
             if(nameInput.getText().isEmpty()) return;
+            String passwordCheck = passwordInput.getText();
 
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Confirm Password");
-            dialog.setContentText("Password:");
-            dialog.setHeaderText(null);
-            dialog.setGraphic(null);
 
-            String password ;
-            Optional<String> pwd = dialog.showAndWait();
-            password = pwd.get();
+            String password;
+
+            if(passwordCheck.isEmpty()){
+                password="";
+            }else {
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Confirm Password");
+                dialog.setContentText("Password:");
+                dialog.setHeaderText(null);
+                dialog.setGraphic(null);
+                Optional<String> pwd = dialog.showAndWait();
+                password = pwd.get();
+            }
             if(passwordInput.getText().equals(password)) {
 
                 try {
@@ -170,39 +182,31 @@ public class MainViewController {
                     partList.add(fileP2);
 
 
-
                     ProgressIndicator PI=new ProgressIndicator();
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    Task<Void> indicatorTask = new Task<Void>() {
-                        @Override
-                        protected Void call() throws Exception {
-                            alert.setTitle(null);
-                            alert.setHeaderText(null);
-                            alert.setGraphic(PI);
-                            alert.setContentText("Processing...");
-                            alert.showAndWait();
-                            return null;
-                        }
-                    };
+                    Parent bgRoot = Launcher.stage.getScene().getRoot();
+                    System.out.println("Process window open. Status "+"["+status+"]");
 
-                    ex.submit(indicatorTask);
 
                     Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1 , countDownLatch);
+                    System.out.println("Complete Zipper1 process. Status "+"["+status+"]");
+
                     Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2 , countDownLatch);
+                    System.out.println("Complete Zipper2 process. Status "+"["+status+"]");
+
                     Merger merger = new Merger(output,partList , password , countDownLatch);
+                    System.out.println("Complete Merge process. Status "+"["+status+"]");
 
 
                     ex.submit(part1);
                     ex.submit(part2);
                     ex.submit(merger);
-
-                    alert.setTitle(null);
-                    alert.setHeaderText(null);
-                    alert.setGraphic(null);
-                    alert.setContentText("Done");
-                    alert.showAndWait();
-
                     System.out.println(password);
+
+                    ex.shutdown();
+                    ex.awaitTermination(10, TimeUnit.MINUTES);
+                    System.out.println("All complete"+"["+status+"]");
+                    FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("main-view.fxml"));
+                    Launcher.stage.getScene().setRoot(fxmlLoader.load());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -340,7 +344,7 @@ public class MainViewController {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(null);
             alert.setHeaderText(null);
-            alert.setContentText("We are not support this folder.");
+            alert.setContentText("We are not support "+"'"+file.getName()+"' folder.");
             alert.showAndWait();
         }else {
             img =  new Image(Launcher.class.getResource("fileIcon.png").toString());
@@ -350,6 +354,10 @@ public class MainViewController {
         iv.setFitHeight(148);
         iv.setFitWidth(128);
         String fileName = file.getName();
+        if(fileName.length() > 15){
+            fileName = fileName.substring(0, Math.min(fileName.length(), 15));
+            fileName = fileName+"...";
+        }
         Label label = new Label(fileName);
 
 

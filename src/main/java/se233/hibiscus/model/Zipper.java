@@ -30,7 +30,7 @@ public class Zipper extends Task<Void> {
                 throw new RuntimeException(e);
             }
         });
-        System.out.println("Working!");
+        System.out.println("Zipper processed!");
         this.startSignal.countDown();
 
         return null;
