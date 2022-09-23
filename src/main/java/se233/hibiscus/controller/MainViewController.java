@@ -67,6 +67,8 @@ public class MainViewController {
     private ListView<HBox> previewListView ;
     @FXML
     private Label dropLabel ;
+    @FXML
+    private Button removeAllBtn;
 
     public void initialize() {
 
@@ -102,6 +104,10 @@ public class MainViewController {
 
                     }else {
                         inputListView.getItems().add(myPane);
+                        if(inputListView.getItems().size() > 6){
+                            removeAllBtn.setVisible(true);
+                        }
+
                     }
                 }
 
@@ -110,6 +116,11 @@ public class MainViewController {
             event.setDropCompleted(isSuccesss);
             event.consume();
 
+        });
+
+        removeAllBtn.setOnAction(event ->{
+                inputListView.getItems().clear();
+                removeAllBtn.setVisible(false);
         });
 
         importBtn.setOnAction( event -> {
@@ -140,6 +151,13 @@ public class MainViewController {
 
         continueBtn.setOnAction( event -> {
 
+            if(inputListView.getItems().size()<1){
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle(null);
+                alert.setHeaderText(null);
+                alert.setContentText("There is no file for compost");
+                alert.showAndWait();
+            }
 
             ExecutorService ex = Executors.newFixedThreadPool(3) ;
             CountDownLatch countDownLatch = new CountDownLatch(2);
@@ -207,67 +225,75 @@ public class MainViewController {
         });
 
         extractBtn.setOnAction( event -> {
-            try {
-                ExecutorService es = Executors.newFixedThreadPool(2);
+            if(inputListView.getItems().size()<1){
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle(null);
+                alert.setHeaderText(null);
+                alert.setContentText("There is no file for extract");
+                alert.showAndWait();
+            }else {
+                try {
+                    ExecutorService es = Executors.newFixedThreadPool(2);
 
-                ArrayList<File> fileList = new ArrayList<>();
-                for (int i = 0; i < inputListView.getItems().size(); i++) {
-                    fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
-                }
-
-                List<File> onlyArchiveList = fileList.stream()
-                        .filter(file -> {
-                            String ext = Files.getFileExtension(file.getAbsolutePath());
-                            return ext.equals("zip") ||
-                                    ext.equals("rar") ||
-                                    ext.equals("tar");
-                        })
-                        .collect(Collectors.toList());
-
-                DirectoryChooser dc = new DirectoryChooser();
-                String destPath = dc.showDialog(new Stage()).getAbsolutePath();
-
-               Map<File, String> zipPassword = new HashMap<>() ;
-
-                onlyArchiveList.forEach( file -> {
-                    ZipFile zipFile = new ZipFile(file.getAbsolutePath());
-                    try {
-                        if(zipFile.isEncrypted()){
-
-                            TextInputDialog dialog = new TextInputDialog();
-                            dialog.setTitle(file.getName() + " has password");
-                            dialog.setContentText("Enter password for "+file.getName() + ": ");
-                            dialog.setHeaderText(null);
-                            dialog.setGraphic(null);
-
-                            Optional<String> pwdDialog = dialog.showAndWait();
-                            String password = pwdDialog.get() ;
-                            zipPassword.put(file,password) ;
-                        }
-                    } catch (ZipException e) {
-                        e.printStackTrace();
+                    ArrayList<File> fileList = new ArrayList<>();
+                    for (int i = 0; i < inputListView.getItems().size(); i++) {
+                        fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
                     }
-                });
 
-                List<File> archiveListPart1 = onlyArchiveList.subList(0, (int) (onlyArchiveList.size() / 2));
-                List<File> archiveListPart2 = onlyArchiveList.subList((int) (onlyArchiveList.size() / 2), onlyArchiveList.size());
-                previewListView.getItems().clear();
+                    List<File> onlyArchiveList = fileList.stream()
+                            .filter(file -> {
+                                String ext = Files.getFileExtension(file.getAbsolutePath());
+                                return ext.equals("zip") ||
+                                        ext.equals("rar") ||
+                                        ext.equals("tar");
+                            })
+                            .collect(Collectors.toList());
+
+                    DirectoryChooser dc = new DirectoryChooser();
+                    String destPath = dc.showDialog(new Stage()).getAbsolutePath();
+
+                    Map<File, String> zipPassword = new HashMap<>();
+
+                    onlyArchiveList.forEach(file -> {
+                        ZipFile zipFile = new ZipFile(file.getAbsolutePath());
+                        try {
+                            if (zipFile.isEncrypted()) {
+
+                                TextInputDialog dialog = new TextInputDialog();
+                                dialog.setTitle(file.getName() + " has password");
+                                dialog.setContentText("Enter password for " + file.getName() + ": ");
+                                dialog.setHeaderText(null);
+                                dialog.setGraphic(null);
+
+                                Optional<String> pwdDialog = dialog.showAndWait();
+                                String password = pwdDialog.get();
+                                zipPassword.put(file, password);
+                            }
+                        } catch (ZipException e) {
+                            e.printStackTrace();
+                        }
+                    });
+
+                    List<File> archiveListPart1 = onlyArchiveList.subList(0, (int) (onlyArchiveList.size() / 2));
+                    List<File> archiveListPart2 = onlyArchiveList.subList((int) (onlyArchiveList.size() / 2), onlyArchiveList.size());
+                    previewListView.getItems().clear();
 
 
-                if(archiveListPart2.size() > 0){
-                    Extracter extracterPart2 = new Extracter(archiveListPart2, destPath, zipPassword);
-                    previewListView.getItems().add(drawIndicatorOfFile(extracterPart2));
-                    es.submit(extracterPart2);
+                    if (archiveListPart2.size() > 0) {
+                        Extracter extracterPart2 = new Extracter(archiveListPart2, destPath, zipPassword);
+                        previewListView.getItems().add(drawIndicatorOfFile(extracterPart2));
+                        es.submit(extracterPart2);
+                    }
+                    if (archiveListPart1.size() > 0) {
+                        Extracter extracterPart1 = new Extracter(archiveListPart1, destPath, zipPassword);
+                        previewListView.getItems().add(drawIndicatorOfFile(extracterPart1));
+                        es.submit(extracterPart1);
+                    }
+
+                    es.shutdown();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-                if(archiveListPart1.size() > 0){
-                    Extracter extracterPart1 = new Extracter(archiveListPart1, destPath, zipPassword);
-                    previewListView.getItems().add(drawIndicatorOfFile(extracterPart1));
-                    es.submit(extracterPart1);
-                }
-
-            es.shutdown();
-            }catch (Exception ex){
-                ex.printStackTrace();
             }
         });
     }

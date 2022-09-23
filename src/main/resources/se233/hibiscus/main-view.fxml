@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.PasswordField?>
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="se233.hibiscus.controller.MainViewController">
    <children>
       <Label layoutX="25.0" layoutY="32.0" text="Files" textFill="WHITE">
@@ -25,7 +26,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="continueBtn" layoutX="852.0" layoutY="204.0" minWidth="100.0" mnemonicParsing="false" style="-fx-background-color: green; -fx-background-radius: 17; -fx-border-radius: 17;" text="Continue" textFill="WHITE">
+                        <Button fx:id="continueBtn" layoutX="851.0" layoutY="204.0" minWidth="100.0" mnemonicParsing="false" style="-fx-background-color: green; -fx-background-radius: 7; -fx-border-radius: 7;" text="Continue" textFill="WHITE">
                            <font>
                               <Font name="SF Pro Display Regular" size="17.0" />
                            </font></Button>
@@ -51,7 +52,7 @@
                         </Label>
 
                         <TextField fx:id="nameInput" layoutX="124.0" layoutY="118.0" prefHeight="26.0" prefWidth="217.0" />
-                        <TextField fx:id="passwordInput" layoutX="121.0" layoutY="164.0" prefHeight="26.0" prefWidth="215.0" />
+                        <PasswordField fx:id="passwordInput" layoutX="121.0" layoutY="164.0" prefHeight="26.0" prefWidth="215.0" />
                         <Label layoutX="19.0" layoutY="213.0" text="Note: Do not need to fill password; No password" textFill="#727272" />
                         <ToggleButton fx:id="isTar" layoutX="150.0" layoutY="51.0" minWidth="100.0" mnemonicParsing="false" style="-fx-border-radius: 7;" text="TAR">
                            <font>
@@ -77,7 +78,7 @@
                            </font>
                         </Label>
                         <ListView fx:id="previewListView" layoutX="21.0" layoutY="44.0" prefHeight="135.0" prefWidth="926.0" />
-                        <Button fx:id="extractBtn" layoutX="852.0" layoutY="204.0" minWidth="100.0" mnemonicParsing="false" style="-fx-background-color: green; -fx-background-radius: 17; -fx-border-radius: 17;" text="Extract" textFill="WHITE">
+                        <Button fx:id="extractBtn" layoutX="850.0" layoutY="204.0" minWidth="100.0" mnemonicParsing="false" style="-fx-background-color: green; -fx-background-radius: 7; -fx-border-radius: 7;" text="Extract" textFill="WHITE">
                            <font>
                               <Font name="SF Pro Display Regular" size="17.0" />
                            </font>
@@ -103,5 +104,10 @@
             <Font name="SF Pro Display Bold" size="27.0" />
          </font>
       </Label>
+      <Button fx:id="removeAllBtn" layoutX="870.0" layoutY="236.0" minWidth="100.0" mnemonicParsing="false" style="-fx-background-color: red; -fx-background-radius: 7; -fx-border-radius: 7;" text="Remove all" textFill="WHITE" visible="false">
+         <font>
+            <Font name="SF Pro Display Regular" size="17.0" />
+         </font>
+      </Button>
    </children>
 </Pane>
