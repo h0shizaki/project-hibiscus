@@ -119,8 +119,19 @@ public class MainViewController {
         });
 
         removeAllBtn.setOnAction(event ->{
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(null);
+            alert.setHeaderText(null);
+            alert.setContentText("Are you sure to remove all data; You will not be able to recover data!");
+            alert.showAndWait();
+            if(alert.getResult().getText().equals("Cancel")){
+
+            }else {
                 inputListView.getItems().clear();
                 removeAllBtn.setVisible(false);
+                dropLabel.setVisible(true);
+
+            }
         });
 
         importBtn.setOnAction( event -> {
