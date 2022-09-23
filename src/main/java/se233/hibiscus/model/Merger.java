@@ -1,10 +1,12 @@
 package se233.hibiscus.model;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.VBox;
 import net.lingala.zip4j.ZipFile;
@@ -75,7 +77,23 @@ public class Merger extends Task<Void> {
             tempFile.delete() ;
         });
 
-        System.out.println("Merger processed!");
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(null);
+                alert.setHeaderText(null);
+                alert.setContentText("Complete!");
+                alert.showAndWait();
+                try {
+                    System.out.println("refresh");
+                    FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("main-view.fxml"));
+                    Launcher.stage.getScene().setRoot(fxmlLoader.load());
+                }catch (Exception e){
+                    System.out.println("cannot refresh");
+                }
+            }
+        });
 
         return  null ;
 

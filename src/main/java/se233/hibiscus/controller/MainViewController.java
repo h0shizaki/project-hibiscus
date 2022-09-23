@@ -61,10 +61,10 @@ public class MainViewController {
     private Button continueBtn ;
     @FXML
     private Button extractBtn ;
-
     @FXML
     private ListView<HBox> previewListView ;
-    private int status;
+    @FXML
+    private Label dropLabel ;
 
     public void initialize() {
 
@@ -83,6 +83,7 @@ public class MainViewController {
             boolean isSuccesss = false;
             if (db.hasFiles()) {
                 isSuccesss = true;
+                dropLabel.setVisible(false);
                 String filePath;
 
                 int totalFiles = db.getFiles().size();
@@ -174,28 +175,15 @@ public class MainViewController {
                         fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
                     }
 
-
                     String fileP1 = String.format("%s/%s-part1.%s", destPath, fileName, fileExt);
                     String fileP2 = String.format("%s/%s-part2.%s", destPath, fileName, fileExt);
                     ArrayList<String> partList = new ArrayList<>();
                     partList.add(fileP1);
                     partList.add(fileP2);
 
-
-                    ProgressIndicator PI=new ProgressIndicator();
-                    Parent bgRoot = Launcher.stage.getScene().getRoot();
-                    System.out.println("Process window open. Status "+"["+status+"]");
-
-
                     Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1 , countDownLatch);
-                    System.out.println("Complete Zipper1 process. Status "+"["+status+"]");
-
                     Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2 , countDownLatch);
-                    System.out.println("Complete Zipper2 process. Status "+"["+status+"]");
-
                     Merger merger = new Merger(output,partList , password , countDownLatch);
-                    System.out.println("Complete Merge process. Status "+"["+status+"]");
-
 
                     ex.submit(part1);
                     ex.submit(part2);
@@ -204,9 +192,6 @@ public class MainViewController {
 
                     ex.shutdown();
                     ex.awaitTermination(10, TimeUnit.MINUTES);
-                    System.out.println("All complete"+"["+status+"]");
-                    FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("main-view.fxml"));
-                    Launcher.stage.getScene().setRoot(fxmlLoader.load());
 
                 } catch (Exception e) {
                     e.printStackTrace();
