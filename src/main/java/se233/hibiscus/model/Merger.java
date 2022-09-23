@@ -1,11 +1,21 @@
 package se233.hibiscus.model;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.VBox;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
+import se233.hibiscus.Launcher;
 
+import javax.security.auth.callback.LanguageCallback;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +37,6 @@ public class Merger extends Task<Void> {
         for (String filename : splitFileName ){
             splitZipFileList.add(new File(filename));
         }
-
     }
 
     @Override
@@ -68,7 +77,23 @@ public class Merger extends Task<Void> {
             tempFile.delete() ;
         });
 
-        System.out.println("Complete");
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(null);
+                alert.setHeaderText(null);
+                alert.setContentText("Complete!");
+                alert.showAndWait();
+                try {
+                    System.out.println("refresh");
+                    FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("main-view.fxml"));
+                    Launcher.stage.getScene().setRoot(fxmlLoader.load());
+                }catch (Exception e){
+                    System.out.println("cannot refresh");
+                }
+            }
+        });
 
         return  null ;
 

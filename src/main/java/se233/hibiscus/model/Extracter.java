@@ -32,8 +32,13 @@ public class Extracter extends Task<Void> {
 
         for(int i = 0 ; i < files.size() ; i++){
             File file = files.get(i) ;
-            ZipFile zipFile = new ZipFile(file.getAbsolutePath(), passwordMap.get(file).toCharArray());
             try{
+
+            ZipFile zipFile = new ZipFile(file.getAbsolutePath());
+            if(zipFile.isEncrypted()){
+                zipFile = new ZipFile(file.getAbsolutePath(), passwordMap.get(file).toCharArray());
+            }
+
             zipFile.extractAll(destPath);
             }catch (ZipException ex){
                 Platform.runLater(new Runnable() {
