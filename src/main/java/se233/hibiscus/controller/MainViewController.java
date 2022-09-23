@@ -17,6 +17,8 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import se233.hibiscus.Launcher;
 import se233.hibiscus.model.Extracter;
 import se233.hibiscus.model.Merger;
@@ -202,7 +204,7 @@ public class MainViewController {
                     alert.setContentText("Done");
                     alert.showAndWait();
 
-                    System.out.println(password);
+//                    System.out.println(password);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -219,7 +221,6 @@ public class MainViewController {
         extractBtn.setOnAction( event -> {
             try {
                 ExecutorService es = Executors.newFixedThreadPool(2);
-                CountDownLatch countDownLatch = new CountDownLatch(2) ;
 
                 ArrayList<File> fileList = new ArrayList<>();
                 for (int i = 0; i < inputListView.getItems().size(); i++) {
@@ -238,22 +239,47 @@ public class MainViewController {
                 DirectoryChooser dc = new DirectoryChooser();
                 String destPath = dc.showDialog(new Stage()).getAbsolutePath();
 
+               Map<File, String> zipPassword = new HashMap<>() ;
+
+                onlyArchiveList.forEach( file -> {
+                    ZipFile zipFile = new ZipFile(file.getAbsolutePath());
+                    try {
+                        if(zipFile.isEncrypted()){
+
+                            TextInputDialog dialog = new TextInputDialog();
+                            dialog.setTitle(file.getName() + " has password");
+                            dialog.setContentText("Enter password for "+file.getName() + ": ");
+                            dialog.setHeaderText(null);
+                            dialog.setGraphic(null);
+
+                            Optional<String> pwdDialog = dialog.showAndWait();
+                            String password = pwdDialog.get() ;
+                            zipPassword.put(file,password) ;
+                        }
+                    } catch (ZipException e) {
+                        e.printStackTrace();
+                    }
+                });
+
                 List<File> archiveListPart1 = onlyArchiveList.subList(0, (int) (onlyArchiveList.size() / 2));
                 List<File> archiveListPart2 = onlyArchiveList.subList((int) (onlyArchiveList.size() / 2), onlyArchiveList.size());
                 previewListView.getItems().clear();
 
-                Extracter extracterPart1 = new Extracter(archiveListPart1, destPath,countDownLatch);
-                Extracter extracterPart2 = new Extracter(archiveListPart2, destPath,countDownLatch);
 
-                previewListView.getItems().add(drawIndicatorOfFile(extracterPart2));
-                previewListView.getItems().add(drawIndicatorOfFile(extracterPart1));
-//            System.out.println(extracterPart2.getFiles());
+                if(archiveListPart2.size() > 0){
+                    Extracter extracterPart2 = new Extracter(archiveListPart2, destPath, zipPassword);
+                    previewListView.getItems().add(drawIndicatorOfFile(extracterPart2));
+                    es.submit(extracterPart2);
+                }
+                if(archiveListPart1.size() > 0){
+                    Extracter extracterPart1 = new Extracter(archiveListPart1, destPath, zipPassword);
+                    previewListView.getItems().add(drawIndicatorOfFile(extracterPart1));
+                    es.submit(extracterPart1);
+                }
 
-            es.submit(extracterPart2);
-            es.submit(extracterPart1);
             es.shutdown();
-            }catch (IndexOutOfBoundsException ex){
-                System.out.println("Err" + ex.getMessage());
+            }catch (Exception ex){
+                ex.printStackTrace();
             }
         });
     }
@@ -282,7 +308,7 @@ public class MainViewController {
 
             label.setAlignment(Pos.CENTER_LEFT);
             progressLabelVBox.setPadding(new Insets(0, 5, 0, 5));
-            myBox.getChildren().addAll(progressLabelVBox);
+            myBox.getChildren().addAll(progressLabelVBox,progressBarVbox);
 
         }catch (Exception e){
 //            e.printStackTrace();
