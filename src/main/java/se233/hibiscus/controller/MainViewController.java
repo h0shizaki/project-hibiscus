@@ -150,12 +150,19 @@ public class MainViewController {
         });
 
         removeBtn.setOnAction( event -> {
+            if(inputListView.getItems().size()<1){
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle(null);
+                alert.setHeaderText(null);
+                alert.setContentText("There is no file to compost");
+                alert.showAndWait();
+            }
             System.out.println(fileMap);
             if(inputListView.getItems().size() < 1){
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle(null);
                 alert.setHeaderText(null);
-                alert.setContentText("There is no file for remove");
+                alert.setContentText("There is no file to remove");
                 alert.showAndWait();
             }else {
                 try{
@@ -170,18 +177,14 @@ public class MainViewController {
         });
 
         continueBtn.setOnAction( event -> {
-
             if(inputListView.getItems().size()<1){
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle(null);
                 alert.setHeaderText(null);
-                alert.setContentText("There is no file for compost");
+                alert.setContentText("There is no file to remove");
                 alert.showAndWait();
             }
-
-
             CountDownLatch countDownLatch = new CountDownLatch(2);
-
             if(inputListView.getItems().size() <= 0) return;
             if(nameInput.getText().isEmpty()) return;
             String passwordCheck = passwordInput.getText();
@@ -271,7 +274,7 @@ public class MainViewController {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle(null);
                 alert.setHeaderText(null);
-                alert.setContentText("There is no file for extract");
+                alert.setContentText("There is no file to extract");
                 alert.showAndWait();
             }else {
                 try {
@@ -424,6 +427,22 @@ public class MainViewController {
             alert.setHeaderText(null);
             alert.setContentText("We are not support "+"'"+file.getName()+"' folder.");
             alert.showAndWait();
+        }else if (ext.toLowerCase().equals("php")){
+            img =  new Image(Launcher.class.getResource("phpIcon.png").toString());
+        }else if (ext.toLowerCase().equals("html")){
+            img =  new Image(Launcher.class.getResource("htmlIcon.png").toString());
+        }else if (ext.toLowerCase().equals("css")){
+            img =  new Image(Launcher.class.getResource("cssIcon.png").toString());
+        }else if (ext.toLowerCase().equals("swift")){
+            img =  new Image(Launcher.class.getResource("swiftIcon.png").toString());
+        }else if (ext.toLowerCase().equals("psd")){
+            img =  new Image(Launcher.class.getResource("psIcon.png").toString());
+        }else if (ext.toLowerCase().equals("ai")){
+            img =  new Image(Launcher.class.getResource("aiIcon.png").toString());
+        }else if (ext.toLowerCase().equals("mp3")){
+            img =  new Image(Launcher.class.getResource("mp3Icon.png").toString());
+        }else if (ext.toLowerCase().equals("ino")){
+            img =  new Image(Launcher.class.getResource("inoIcon.png").toString());
         }else {
             img =  new Image(Launcher.class.getResource("fileIcon.png").toString());
         }
