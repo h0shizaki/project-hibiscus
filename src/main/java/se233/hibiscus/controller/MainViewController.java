@@ -151,13 +151,22 @@ public class MainViewController {
 
         removeBtn.setOnAction( event -> {
             System.out.println(fileMap);
-            try{
-                Pane selectedItem = inputListView.getSelectionModel().getSelectedItem() ;
-                fileMap.remove(selectedItem);
-                inputListView.getItems().remove(selectedItem) ;
-            }catch (NullPointerException ex){
-                ex.printStackTrace();
+            if(inputListView.getItems().size() < 1){
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle(null);
+                alert.setHeaderText(null);
+                alert.setContentText("There is no file for remove");
+                alert.showAndWait();
+            }else {
+                try{
+                    Pane selectedItem = inputListView.getSelectionModel().getSelectedItem() ;
+                    fileMap.remove(selectedItem);
+                    inputListView.getItems().remove(selectedItem) ;
+                }catch (NullPointerException ex){
+                    ex.printStackTrace();
+                }
             }
+
         });
 
         continueBtn.setOnAction( event -> {
