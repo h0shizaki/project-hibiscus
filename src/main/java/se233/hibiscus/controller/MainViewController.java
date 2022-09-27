@@ -179,7 +179,7 @@ public class MainViewController {
                 alert.showAndWait();
             }
 
-            ExecutorService ex = Executors.newFixedThreadPool(3) ;
+
             CountDownLatch countDownLatch = new CountDownLatch(2);
 
             if(inputListView.getItems().size() <= 0) return;
@@ -210,27 +210,49 @@ public class MainViewController {
                     File destPath = dc.showDialog(new Stage());
                     String output = String.format("%s/%s.%s", destPath, fileName, fileExt);
 
-                    ArrayList<File> fileList = new ArrayList<>();
-                    for (int i = 0; i < inputListView.getItems().size(); i++) {
-                        fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
-                    }
+                    Parent bgRoot = Launcher.stage.getScene().getRoot();
+                    Task<Void> processTask = new Task<Void>() {
+                        ExecutorService ex = Executors.newFixedThreadPool(3) ;
+                        @Override
+                        protected Void call() throws Exception {
+                            ProgressIndicator pi = new ProgressIndicator() ;
+                            VBox box = new VBox(pi) ;
+                            box.setAlignment(Pos.CENTER);
+                            Launcher.stage.getScene().setRoot(box);
 
-                    String fileP1 = String.format("%s/%s-part1.%s", destPath, fileName, fileExt);
-                    String fileP2 = String.format("%s/%s-part2.%s", destPath, fileName, fileExt);
-                    ArrayList<String> partList = new ArrayList<>();
-                    partList.add(fileP1);
-                    partList.add(fileP2);
 
-                    Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1 , countDownLatch);
-                    Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2 , countDownLatch);
-                    Merger merger = new Merger(output,partList , password , countDownLatch);
+                            ArrayList<File> fileList = new ArrayList<>();
+                            for (int i = 0; i < inputListView.getItems().size(); i++) {
+                                fileList.add(new File(fileMap.get(inputListView.getItems().get(i))));
+                            }
 
-                    ex.submit(part1);
-                    ex.submit(part2);
-                    ex.submit(merger);
+                            String fileP1 = String.format("%s/%s-part1.%s", destPath, fileName, fileExt);
+                            String fileP2 = String.format("%s/%s-part2.%s", destPath, fileName, fileExt);
+                            ArrayList<String> partList = new ArrayList<>();
+                            partList.add(fileP1);
+                            partList.add(fileP2);
 
-                    ex.shutdown();
-                    ex.awaitTermination(10, TimeUnit.MINUTES);
+                            Zipper part1 = new Zipper(fileList.subList(0,(int)(fileList.size()/2)),fileP1 , countDownLatch);
+                            Zipper part2 = new Zipper(fileList.subList((int)(fileList.size()/2),fileList.size()),fileP2 , countDownLatch);
+                            Merger merger = new Merger(output,partList , password , countDownLatch);
+
+                            ex.submit(part1);
+                            ex.submit(part2);
+                            ex.submit(merger);
+
+                            ex.shutdown();
+                            ex.awaitTermination(10, TimeUnit.MINUTES);
+                            return null;
+                        }
+                    };
+
+                    processTask.setOnSucceeded( e -> {
+                        Launcher.stage.getScene().setRoot(bgRoot);
+                    });
+
+                    Thread thread = new Thread(processTask) ;
+                    thread.setDaemon(true);
+                    thread.start();
 
                 } catch (Exception e) {
                     e.printStackTrace();
