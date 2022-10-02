@@ -69,6 +69,7 @@ public class MainViewController {
     private Label dropLabel ;
     @FXML
     private Button removeAllBtn;
+
     public void initialize() {
 
         inputListView.setOnDragOver(event -> {
@@ -79,6 +80,7 @@ public class MainViewController {
             } else {
                 event.consume();
             }
+
         });
 
         inputListView.setOnDragDropped(event -> {
@@ -109,6 +111,10 @@ public class MainViewController {
 
                     }
                 }
+                ToggleGroup format = new ToggleGroup();
+                isRar.setToggleGroup(format);
+                isTar.setToggleGroup(format);
+                isZip.setToggleGroup(format);
 
             }
 
@@ -194,12 +200,10 @@ public class MainViewController {
             if(passwordCheck.isEmpty()){
                 password="";
             }else {
-                String fileName = nameInput.getText();
-                String fileExt = getOutputFileExtension();
                 TextInputDialog dialog = new TextInputDialog();
                 dialog.setTitle("Confirm Password");
-                dialog.setHeaderText(fileName+"."+fileExt);
                 dialog.setContentText("Password:");
+                dialog.setHeaderText(null);
                 dialog.setGraphic(null);
                 Optional<String> pwd = dialog.showAndWait();
                 password = pwd.get();
@@ -379,13 +383,18 @@ public class MainViewController {
     }
 
     private String getOutputFileExtension() {
+
         if(isRar.isSelected()){
             return  "rar" ;
         }
         if(isTar.isSelected()){
+            isRar.selectedProperty().equals(null);
+            isZip.selectedProperty().equals(null);
             return  "tar" ;
         }
         if(isZip.isSelected()){
+            isTar.selectedProperty().equals(null);
+            isRar.selectedProperty().equals(null);
             return  "zip" ;
         }
         return "zip";
