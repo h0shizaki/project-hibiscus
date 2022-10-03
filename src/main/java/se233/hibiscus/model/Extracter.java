@@ -45,12 +45,14 @@ public class Extracter extends Task<Void> {
                     @Override
                     public void run() {
                         Alert alert = new Alert(Alert.AlertType.WARNING);
-                        alert.setTitle("Wrong password");
+                        alert.setTitle(ex.getMessage());
                         alert.setHeaderText(null);
-                        alert.setContentText("Wrong password for " + file.getName());
+                        alert.setContentText(ex.getMessage()+" for " + file.getName());
                         alert.showAndWait();
                     }
                 });
+            }catch(Exception e){
+                throw new RuntimeException(e);
             }
 
             updateProgress(i+1,files.size());

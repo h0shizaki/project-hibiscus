@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 
 public class MainViewController {
 
-    private ArrayList<String> fileList ;
     private HashMap<Pane , String> fileMap = new HashMap<>() ;
     @FXML
     private ListView<Pane> inputListView ;
@@ -53,8 +52,6 @@ public class MainViewController {
     private ToggleButton isRar ;
     @FXML
     private ToggleButton isTar;
-    @FXML
-    private ToggleButton is7Zip ;
     @FXML
     private TextField nameInput ;
     @FXML
@@ -130,8 +127,8 @@ public class MainViewController {
                 inputListView.getItems().clear();
                 removeAllBtn.setVisible(false);
                 dropLabel.setVisible(true);
-
             }
+
         });
 
         importBtn.setOnAction( event -> {
@@ -178,8 +175,6 @@ public class MainViewController {
                 alert.setContentText("There is no file for compost");
                 alert.showAndWait();
             }
-
-
             CountDownLatch countDownLatch = new CountDownLatch(2);
 
             if(inputListView.getItems().size() <= 0) return;
@@ -312,7 +307,7 @@ public class MainViewController {
                                 zipPassword.put(file, password);
                             }
                         } catch (ZipException e) {
-                            e.printStackTrace();
+                            System.out.println(e.getMessage());
                         }
                     });
 
@@ -333,45 +328,40 @@ public class MainViewController {
                     }
 
                     es.shutdown();
-                } catch (Exception ex) {
+                } catch (Exception ex ) {
                     ex.printStackTrace();
                 }
             }
         });
     }
 
-    private HBox drawIndicatorOfFile(Extracter extracter){
+    private HBox drawIndicatorOfFile(Extracter extracter) throws Exception {
         HBox myBox = new HBox();
         myBox.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(7), BorderWidths.DEFAULT)));
 
-        try {
-            VBox progressLabelVBox = new VBox();
-            VBox progressBarVbox = new VBox();
+        VBox progressLabelVBox = new VBox();
+        VBox progressBarVbox = new VBox();
 
-            String progressName = "";
-            for (File file : extracter.getFiles()) {
-                progressName += String.format("%s\t\n", file.getName());
-            }
-
-            Label label = new Label(progressName);
-            progressLabelVBox.getChildren().add(label);
-
-            ProgressBar pb = new ProgressBar();
-            pb.setProgress(0.0);
-            pb.progressProperty().bind(extracter.progressProperty());
-            progressBarVbox.getChildren().add(pb);
-            progressBarVbox.setAlignment(Pos.CENTER_LEFT);
-
-            label.setAlignment(Pos.CENTER_LEFT);
-            progressLabelVBox.setPadding(new Insets(0, 5, 0, 5));
-            myBox.getChildren().addAll(progressLabelVBox,progressBarVbox);
-
-        }catch (Exception e){
-//            e.printStackTrace();
-            System.out.println("Err"+ e.getMessage());
+        String progressName = "";
+        for (File file : extracter.getFiles()) {
+            progressName += String.format("%s\t\n", file.getName());
         }
-        return myBox;
 
+        Label label = new Label(progressName);
+        progressLabelVBox.getChildren().add(label);
+
+        ProgressBar pb = new ProgressBar();
+        pb.setProgress(0.0);
+        pb.progressProperty().bind(extracter.progressProperty());
+        progressBarVbox.getChildren().add(pb);
+        progressBarVbox.setAlignment(Pos.CENTER_LEFT);
+
+        label.setAlignment(Pos.CENTER_LEFT);
+        progressLabelVBox.setPadding(new Insets(0, 5, 0, 5));
+        myBox.getChildren().addAll(progressLabelVBox,progressBarVbox);
+
+
+        return myBox;
     }
 
     private String getOutputFileExtension() {
