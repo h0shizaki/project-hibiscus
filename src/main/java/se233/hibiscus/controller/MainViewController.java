@@ -213,6 +213,11 @@ public class MainViewController {
 
                     String fileName = nameInput.getText();
                     File destPath = dc.showDialog(new Stage());
+
+                    if(destPath == null){
+                        return;
+                    }
+
                     String output = String.format("%s/%s.%s", destPath, fileName, fileExt);
 
                     Parent bgRoot = Launcher.stage.getScene().getRoot();
@@ -254,6 +259,7 @@ public class MainViewController {
                     processTask.setOnSucceeded( e -> {
                         Launcher.stage.getScene().setRoot(bgRoot);
                     });
+
 
                     Thread thread = new Thread(processTask) ;
                     thread.setDaemon(true);
